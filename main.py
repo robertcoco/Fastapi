@@ -28,7 +28,7 @@ def create_perseon(person: Person = Body(...)):
     return person
 
 #Validaciones: query parameters
-@app.get("person/detali")
+@app.get("/person/detail")
 def show_person(
     name: Optional[str] = Query(None, min_length=1, max_length=50),
     age: str = Query(...)
