@@ -8,6 +8,10 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi import Body, Query, Path
 
+class Location(BaseModel):
+    city: str
+    state: str
+    country: str
 
 class Person(BaseModel):
     first_name: str
@@ -25,7 +29,7 @@ def home():
 
 # Request and Response body
 @app.post("/person/new")
-def create_perseon(person: Person = Body(...)):
+def create_person(person: Person = Body(...)):
     return person
 
 #Validaciones: query parameters
@@ -47,7 +51,6 @@ def show_person(
     return{name: age}
 
 #Validaciones: path parameters
-
 @app.get("/person/datail/{person_id}")
 def show_person_id(
     person_id: int = Path(
@@ -59,3 +62,25 @@ def show_person_id(
 ):
     return{person_id: "It is person"}
 
+#validaciones: resquest body
+@app.put("/person/{person_id}")
+def update_person(
+    person_id: int = Path(
+        ...,
+        title = "Person id",
+        description = "This is person id. It's required"
+        ),
+    person: Person = Body(
+        ...,
+        title = "Person information",
+        description = "person personal information"
+        ),
+    location: Location = Body(
+        ...,
+        title = "Location information",
+        description = "Person location"
+        )
+):
+    results = person.dict()
+    results.update(location.dict())
+    return results
