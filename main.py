@@ -1,6 +1,7 @@
 #pythonthings
 from typing import Optional
 from enum import Enum
+from datetime import date
 
 #pydantic
 from pydantic import BaseModel, Field, EmailStr, PastDate
@@ -39,9 +40,7 @@ class Location(BaseModel):
          example = "R.D"
         )
     
-
-
-class Person(BaseModel):
+class PersonBase(BaseModel):
     first_name: str = Field(
         ...,
         title = "First name ",
@@ -50,7 +49,7 @@ class Person(BaseModel):
         max_length = 50
         )
 
-    second_name: str =  Field(
+    last_name: str =  Field(
         ...,
         title = "First name ",
         description = "First name of the person",
@@ -70,10 +69,15 @@ class Person(BaseModel):
 
     is_married: Optional[bool] = Field(default = None)
 
-    born_date: PastDate
+    born_date: PastDate = Field(default = None)
 
-    email: EmailStr 
+    email: EmailStr = Field(default = None)
 
+class PersonOut(PersonBase):
+    pass
+
+class Person(PersonBase):
+    
     class Config:
         schema_extra = {
             "example": {
@@ -81,9 +85,14 @@ class Person(BaseModel):
                 "last_name": "Abad De Los Santos",
                 "age": 19,
                 "hair_color": "black",
-                "is_married": False
+                "is_married": False,
+                "password": "yoyinaguahace",
+                "email": "perdonholaperdon123@gmail.com",
+                "account_money": 4556.5767,
+                "born_date":  date(2003, 8, 18)
             }
         }
+    password: str = Field(..., min_length = 8)
 
 app = FastAPI()
 
@@ -93,7 +102,7 @@ def home():
 
 
 # Request and Response body
-@app.post("/person/new")
+@app.post("/person/new", response_model = PersonOut)
 def create_person(person: Person = Body(...)):
     return person
 
