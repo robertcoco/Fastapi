@@ -7,7 +7,7 @@ from datetime import date
 from pydantic import BaseModel, Field, EmailStr, PastDate
 
 #Fastapi
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi import Body, Query, Path
 
 class HairColor(Enum):
@@ -96,18 +96,28 @@ class Person(PersonBase):
 
 app = FastAPI()
 
-@app.get("/")
+@app.get(
+    path = "/",
+    status_code = status.HTTP_200_OK 
+    )
 def home():
      return {"Hello": "World"}
 
 
 # Request and Response body
-@app.post("/person/new", response_model = PersonOut)
+@app.post(
+    path = "/person/new",
+    response_model = PersonOut,
+    status_code = status.HTTP_201_CREATED
+    )
 def create_person(person: Person = Body(...)):
     return person
 
 #Validaciones: query parameters
-@app.get("/person/detail")
+@app.get(
+    path = "/person/detail",
+    status_code = status.HTTP_200_OK
+    )
 def show_person(
     name: Optional[str] = Query(
         None,
@@ -115,19 +125,22 @@ def show_person(
         max_length=50,
         title = "Person name",
         description= "This is the person name. The number of characters must be between 1 and 50",
-         example = "Angel"
+        example = "Angel"
         ),
     age: int = Query(
         ...,
         title = "Person age",
         description = "This is the person age. It's required",
-         example = 12
+        example = 12
         )
 ):
     return{name: age}
 
 #Validaciones: path parameters
-@app.get("/person/datail/{person_id}")
+@app.get(
+    path = "/person/datail/{person_id}",
+    status_code = status.HTTP_200_OK
+    )
 def show_person_id(
     person_id: int = Path(
         ..., 
@@ -140,7 +153,10 @@ def show_person_id(
     return{person_id: "It is person"}
 
 #validaciones: resquest body
-@app.put("/person/{person_id}")
+@app.put(
+    path = "/person/{person_id}",
+    status_code = status.HTTP_200_OK
+    )
 def update_person(
     person_id: int = Path(
         ...,
