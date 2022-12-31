@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, EmailStr, PastDate
 
 #Fastapi
 from fastapi import FastAPI, status
-from fastapi import Body, Query, Path
+from fastapi import Body, Query, Path, Form
 
 class HairColor(Enum):
     white = "white"
@@ -94,6 +94,14 @@ class Person(PersonBase):
         }
     password: str = Field(..., min_length = 8)
 
+class LoggingOut(BaseModel):
+    username: str = Field(
+        ..., 
+        max_length = 20,
+        example = "angelo495"
+        )
+    message: str = Field(default = "Logged susccesfully")
+
 app = FastAPI()
 
 @app.get(
@@ -178,3 +186,14 @@ def update_person(
     results = person.dict()
     results.update(location.dict())
     return results
+
+@app.post(
+    path = "/login",
+    response_model = LoggingOut,
+    status_code = status.HTTP_200_OK
+    )
+def Login(
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    return LoggingOut(username = username)
