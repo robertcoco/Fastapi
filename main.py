@@ -1,14 +1,17 @@
-#pythonthings
+#PythonThings
 from typing import Optional
 from enum import Enum
 from datetime import date
 
-#pydantic
-from pydantic import BaseModel, Field, EmailStr, PastDate
+#Pydantic
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic import EmailStr, PastDate
 
 #Fastapi
 from fastapi import FastAPI, status
 from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
+from fastapi import HTTPException
 
 class HairColor(Enum):
     white = "white"
@@ -145,6 +148,9 @@ def show_person(
     return{name: age}
 
 #Validaciones: path parameters
+
+persons = [1, 2, 3, 4, 6]
+
 @app.get(
     path = "/person/datail/{person_id}",
     status_code = status.HTTP_200_OK
@@ -158,6 +164,11 @@ def show_person_id(
         example = 12
         )
 ):
+    if person_id not in persons:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "The person doesn't exist"
+        )
     return{person_id: "It is person"}
 
 #validaciones: resquest body
