@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, EmailStr, PastDate
 
 #Fastapi
 from fastapi import FastAPI, status
-from fastapi import Body, Query, Path, Form
+from fastapi import Body, Query, Path, Form, Header, Cookie
 
 class HairColor(Enum):
     white = "white"
@@ -187,8 +187,11 @@ def update_person(
     results.update(location.dict())
     return results
 
+
+# Form logging
 @app.post(
     path = "/login",
+    # response model to ignore some information we dont want to send to the client
     response_model = LoggingOut,
     status_code = status.HTTP_200_OK
     )
@@ -197,3 +200,31 @@ def Login(
     password: str = Form(...)
 ):
     return LoggingOut(username = username)
+
+# Cookies and headers parameters
+
+@app.post(
+    path = "/contact",
+    status_code = status.HTTP_200_OK,
+)
+def contact(
+    first_name: str = Form(
+        ...,
+        example = "Roberto Angel",
+        min_length = 1,
+        max_length = 50 
+        ),
+    last_name: str = Form(
+        ...,
+        max_length= 50,
+        min_length = 1,
+        example = "Abad De Los Santos"
+        ),
+    user_agent: Optional[str] = Header(default = None),
+    ads: Optional[str] = Cookie(default = None),
+    Email: EmailStr = Form(
+        ...,
+        example = "perdonholaperdon123@gmail.com"
+        )
+):
+    return user_agent
