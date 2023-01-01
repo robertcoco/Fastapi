@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, EmailStr, PastDate
 
 #Fastapi
 from fastapi import FastAPI, status
-from fastapi import Body, Query, Path, Form, Header, Cookie
+from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
 
 class HairColor(Enum):
     white = "white"
@@ -228,3 +228,15 @@ def contact(
         )
 ):
     return user_agent
+
+@app.post(
+    path = "/postimage",
+)
+def post_image(
+    image: UploadFile = File(...)
+):
+    return {
+        "Filename": image.filename,
+        "Format": image.content_type,
+        "Size(kb)": round(len(image.file.read())/1024, ndigits = 2)
+    }
