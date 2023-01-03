@@ -13,6 +13,7 @@ from fastapi import FastAPI, status
 from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
 from fastapi import HTTPException
 
+
 class HairColor(Enum):
     white = "white"
     brown = "brown"
@@ -108,26 +109,56 @@ class LoggingOut(BaseModel):
 app = FastAPI()
 
 @app.get(
-    path = "/",
-    status_code = status.HTTP_200_OK 
+    path = "/home",
+    status_code = status.HTTP_200_OK,
+    tags = ["Home"],
+    summary = "Returns a json file hello world"
     )
 def home():
-     return {"Hello": "World"}
+    """
+    Say hello world 
+
+    Say hello world to the user 
+
+    Parameters:
+
+        - No parameters
+    
+    Returns a json file with a key hello and value world
+    """
+    return {"Hello": "World"}
 
 
 # Request and Response body
 @app.post(
     path = "/person/new",
     response_model = PersonOut,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    tags = ["Persons"],
+    summary = "Create a person in the app"
     )
 def create_person(person: Person = Body(...)):
+    """
+    Create a person
+
+    This path operation creates a person in the app and save it the database
+
+    Parameters:
+
+        - Request body parameters:
+
+            - **person: Person -> a person model with first name, last name, age, hair color, marital status and password**
+    
+    Returns a person model with first name, last name, age, hair color, marital status
+    """
     return person
 
 #Validaciones: query parameters
 @app.get(
     path = "/person/detail",
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    tags = ["Persons"],
+    summary = "this gets the name and the age of the person from query parameter and then show it"
     )
 def show_person(
     name: Optional[str] = Query(
@@ -145,6 +176,20 @@ def show_person(
         example = 12
         )
 ):
+    """
+    Get person basic information
+
+    This gets the name and the age of the person 
+
+    Parameters:
+
+        - Query parameters:
+
+            - **name: name the of the person**
+            - **age : age of the person**
+    
+    Returns the name and the age of the person
+    """
     return{name: age}
 
 #Validaciones: path parameters
@@ -153,7 +198,9 @@ persons = [1, 2, 3, 4, 6]
 
 @app.get(
     path = "/person/datail/{person_id}",
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    tags = ["Persons"],
+    summary= "Gets and return the person id "
     )
 def show_person_id(
     person_id: int = Path(
@@ -174,7 +221,9 @@ def show_person_id(
 #validaciones: resquest body
 @app.put(
     path = "/person/{person_id}",
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    tags = ["Persons"],
+    summary = "Gets the person information"
     )
 def update_person(
     person_id: int = Path(
@@ -194,6 +243,23 @@ def update_person(
         description = "Person location"
         )
 ):
+    """
+    Update the person information
+
+    Update the person information that includes the first name, last name, age, hair color, marital status, location 
+
+    Parameters:
+
+        - Path parameters:
+
+            - **Person id: the identifier of the person**
+            
+        - Request body parameters:
+        
+            - **person: person information read above**
+
+    Returns the person information
+    """
     results = person.dict()
     results.update(location.dict())
     return results
@@ -204,12 +270,28 @@ def update_person(
     path = "/login",
     # response model to ignore some information we dont want to send to the client
     response_model = LoggingOut,
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    tags = ["Login"],
+    summary = "Log a person in the application"
     )
 def Login(
     username: str = Form(...),
     password: str = Form(...)
 ):
+    """
+    User Logging
+
+    Get the user's username and the user's password
+
+    Parameters:
+
+        - Form parameters: 
+
+            - **username**
+            - **password**
+    
+    Returns the username
+    """
     return LoggingOut(username = username)
 
 # Cookies and headers parameters
@@ -217,6 +299,8 @@ def Login(
 @app.post(
     path = "/contact",
     status_code = status.HTTP_200_OK,
+    tags = ["Contact"],
+    summary = "Get the contact information of a person"
 )
 def contact(
     first_name: str = Form(
@@ -238,14 +322,50 @@ def contact(
         example = "perdonholaperdon123@gmail.com"
         )
 ):
+    """
+    Person contact inforamtion
+
+    Get the contact inforamtion of a particular person
+
+    Parameters:
+
+        - Form parameters:
+
+            - ** first name **
+            - ** last name **
+        
+        - Cookie:
+
+            - ** ads: informacion para anuncios **
+        
+        - Header: 
+
+            - ** user agent: user pc's information
+    
+    Returns the user agent information
+    """
     return user_agent
 
 @app.post(
     path = "/postimage",
+    status_code = status.HTTP_200_OK,
+    tags = ["PostImage"],
+    summary = "Get the inforamtion of a uploaded file"
 )
 def post_image(
     image: UploadFile = File(...)
 ):
+    """
+    File information
+
+    Get the inforamation of a file
+
+    Parameters: 
+
+        - File parameter:
+
+            - ** image **
+    """
     return {
         "Filename": image.filename,
         "Format": image.content_type,
