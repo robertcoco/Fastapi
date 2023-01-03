@@ -158,7 +158,8 @@ def create_person(person: Person = Body(...)):
     path = "/person/detail",
     status_code = status.HTTP_200_OK,
     tags = ["Persons"],
-    summary = "this gets the name and the age of the person from query parameter and then show it"
+    summary = "this gets the name and the age of the person from query parameter and then show it",
+    depracated = True
     )
 def show_person(
     name: Optional[str] = Query(
@@ -300,7 +301,7 @@ def Login(
     path = "/contact",
     status_code = status.HTTP_200_OK,
     tags = ["Contact"],
-    summary = "Get the contact information of a person"
+    summary = "Get the contact information of a persone"
 )
 def contact(
     first_name: str = Form(
